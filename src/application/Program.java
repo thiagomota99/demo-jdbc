@@ -13,5 +13,4 @@ public class Program {
 		Vendedor vendedor = new Vendedor(21, "Bob", "bob@gmail.com", new Date(), 3000.0, departamento);
 		System.out.println(vendedor);
 	}
-
 }
