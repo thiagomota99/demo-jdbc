@@ -1,11 +1,25 @@
 package model.dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
+import db.DB;
+import db.DbException;
 import model.dao.VendedorDAO;
+import model.entities.Departamento;
+import model.entities.Vendedor;
 
 public class VendedorDaoJDBC implements VendedorDAO{
-
+	
+	private Connection connection;
+	
+	public VendedorDaoJDBC(Connection connection) {
+		this.connection = connection;
+	}
+	
 	@Override
 	public void insert(VendedorDAO obj) {
 		// TODO Auto-generated method stub
@@ -25,13 +39,48 @@ public class VendedorDaoJDBC implements VendedorDAO{
 	}
 
 	@Override
-	public VendedorDAO findById(Integer id) {
-		// TODO Auto-generated method stub
+	public Vendedor findById(Integer id) {
+		PreparedStatement preparedStament = null;
+		ResultSet resultSet = null;
+		try {
+			preparedStament = connection.prepareStatement(
+					"SELECT seller.*, department.Name as DepName "
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id "
+					+ "WHERE seller.Id = ?");
+			
+			preparedStament.setInt(1, id);
+			resultSet = preparedStament.executeQuery();
+			
+			if(resultSet.next()) {
+				Departamento departamento = new Departamento();
+				departamento.setId(resultSet.getInt("DepartmentId"));
+				departamento.setNome(resultSet.getString("DepName"));
+				
+				Vendedor vendedor = new Vendedor();
+				vendedor.setId(resultSet.getInt("Id"));
+				vendedor.setNome(resultSet.getString("Name"));
+				vendedor.setEmail(resultSet.getString("Email"));
+				vendedor.setSalarioBase(resultSet.getDouble("BaseSalary"));
+				vendedor.setDataAniversario(resultSet.getDate("BirthDate"));
+				vendedor.setDepartamento(departamento);
+				
+				return vendedor;
+			}
+				
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(preparedStament);
+			DB.closeResultSet(resultSet);
+		}
+		
 		return null;
 	}
 
 	@Override
-	public List<VendedorDAO> findAll() {
+	public List<Vendedor> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}	
