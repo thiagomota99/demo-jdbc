@@ -22,10 +22,15 @@ public class ProgramTesteDepartamento {
 		listaDepartamento.forEach(System.out::println);
 		
 		System.out.println("=== TESTE 3: Departamento insert ===");
-		Departamento novoDepartamento = new Departamento(null, "Malandro");
+		Departamento novoDepartamento = new Departamento(null, "Teconologia da Infomação");
 		departamentoDAO.insert(novoDepartamento);
 		System.out.println("Inserido! Novo Departamento Id: " + novoDepartamento.getId());
 		
+		System.out.println("=== TESTE 4: Departamento update ===");
+		novoDepartamento.setNome("T.I");
+		departamentoDAO.update(novoDepartamento);
+		System.out.println("Atualizado!");
+			
 		DB.closeConnection();
 	}
 
