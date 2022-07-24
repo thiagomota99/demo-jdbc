@@ -66,8 +66,16 @@ public class DepartamentoDaoJDBC implements DepartamentoDAO{
 
 	@Override
 	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
-		
+		try {
+			preparedStatement = connection.prepareStatement("DELETE FROM Department WHERE Id = ?");
+			preparedStatement.setInt(1, id);
+			
+			int linhasAfetadas = preparedStatement.executeUpdate();
+			if(linhasAfetadas == 0)
+				throw new DbException("Erro inesperado! Nenhuma linha afetada!");			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
 	}
 
 	@Override

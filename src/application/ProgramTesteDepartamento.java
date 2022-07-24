@@ -30,7 +30,11 @@ public class ProgramTesteDepartamento {
 		novoDepartamento.setNome("T.I");
 		departamentoDAO.update(novoDepartamento);
 		System.out.println("Atualizado!");
-			
+		
+		System.out.println("=== TESTE 5: Departamento delete ===");
+		departamentoDAO.deleteById(novoDepartamento.getId());
+		System.out.println("Deletado!");
+		
 		DB.closeConnection();
 	}
 
