@@ -21,6 +21,11 @@ public class ProgramTesteDepartamento {
 		List<Departamento> listaDepartamento = departamentoDAO.findAll();
 		listaDepartamento.forEach(System.out::println);
 		
+		System.out.println("=== TESTE 3: Departamento insert ===");
+		Departamento novoDepartamento = new Departamento(null, "Malandro");
+		departamentoDAO.insert(novoDepartamento);
+		System.out.println("Inserido! Novo Departamento Id: " + novoDepartamento.getId());
+		
 		DB.closeConnection();
 	}
 
