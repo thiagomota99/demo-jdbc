@@ -1,6 +1,5 @@
 package application;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +34,12 @@ public class Program {
 		Vendedor novoVendedor = new Vendedor(null, "Greg", "greg@gmail.com", new Date(), 4000.0, departamento);
 		vendedorDAO.insert(novoVendedor);
 		System.out.println("Inserido! Novo id: " + novoVendedor.getId());
+		
+		System.out.println("\n=== TESTE 5: Vendedor update ===");
+		vendedor = vendedorDAO.findById(1);
+		vendedor.setNome("Martha Waine");
+		vendedorDAO.update(vendedor);
+		System.out.println("Atualizado! Novos Dados: " + vendedor);
 		
 		DB.closeConnection();		
 	}
