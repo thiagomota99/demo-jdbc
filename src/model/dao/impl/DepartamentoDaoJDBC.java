@@ -3,8 +3,11 @@ package model.dao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
+import db.DB;
+import db.DbException;
 import model.dao.DepartamentoDAO;
 import model.entities.Departamento;
 
@@ -37,7 +40,23 @@ public class DepartamentoDaoJDBC implements DepartamentoDAO{
 
 	@Override
 	public Departamento findById(Integer id) {
-		// TODO Auto-generated method stub
+		try {
+			preparedStatement = connection.prepareStatement("SELECT * FROM Department WHERE Id = ?");
+			preparedStatement.setInt(1, id);
+			
+			resultSet = preparedStatement.executeQuery();
+			if(resultSet.next()) {
+				Departamento dep = new Departamento(resultSet.getInt("Id"), resultSet.getString("Name"));
+				return dep;
+			}
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(preparedStatement);
+			DB.closeResultSet(resultSet);
+		}
 		return null;
 	}
 
