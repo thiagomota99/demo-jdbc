@@ -1,9 +1,11 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,19 +20,49 @@ import model.entities.Vendedor;
 public class VendedorDaoJDBC implements VendedorDAO{
 	
 	private Connection connection;
+	private PreparedStatement preparedStatement;
+	private ResultSet resultSet;
 	
 	public VendedorDaoJDBC(Connection connection) {
 		this.connection = connection;
 	}
 	
 	@Override
-	public void insert(VendedorDAO obj) {
-		// TODO Auto-generated method stub
-		
+	public void insert(Vendedor obj) {
+		try {
+			preparedStatement = connection.prepareStatement(""
+					+ "INSERT INTO seller "
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "values (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			
+			preparedStatement.setString(1, obj.getNome());
+			preparedStatement.setString(2, obj.getEmail());
+			preparedStatement.setDate(3, new java.sql.Date(obj.getDataAniversario().getTime()));
+			preparedStatement.setDouble(4, obj.getSalarioBase());
+			preparedStatement.setInt(5, obj.getDepartamento().getId());
+			
+			int linhasAfetadas = preparedStatement.executeUpdate();
+			if(linhasAfetadas > 0) {
+				resultSet = preparedStatement.getGeneratedKeys();
+				if(resultSet.next()) {
+					int id = resultSet.getInt(1);
+					obj.setId(id);
+				}
+			}
+			else {
+				throw new DbException("Erro inesperado! Nenhuma linha foi afetada!");
+			}
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(preparedStatement);
+			DB.closeResultSet(resultSet);
+		}
 	}
 
 	@Override
-	public void update(VendedorDAO obj) {
+	public void update(Vendedor obj) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -43,17 +75,15 @@ public class VendedorDaoJDBC implements VendedorDAO{
 
 	@Override
 	public Vendedor findById(Integer id) {
-		PreparedStatement preparedStament = null;
-		ResultSet resultSet = null;
 		try {
-			preparedStament = connection.prepareStatement(
+			preparedStatement = connection.prepareStatement(
 					"SELECT seller.*, department.Name as DepName "
 					+ "FROM seller INNER JOIN department "
 					+ "ON seller.DepartmentId = department.Id "
 					+ "WHERE seller.Id = ?");
 			
-			preparedStament.setInt(1, id);
-			resultSet = preparedStament.executeQuery();
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
 			
 			if(resultSet.next()) {
 				Departamento departamento = instanciarDepartamento(resultSet);
@@ -65,7 +95,7 @@ public class VendedorDaoJDBC implements VendedorDAO{
 			throw new DbException(e.getMessage());
 		}
 		finally {
-			DB.closeStatement(preparedStament);
+			DB.closeStatement(preparedStatement);
 			DB.closeResultSet(resultSet);
 		}
 		
@@ -92,16 +122,14 @@ public class VendedorDaoJDBC implements VendedorDAO{
 
 	@Override
 	public List<Vendedor> findAll() {
-		PreparedStatement preparedStament = null;
-		ResultSet resultSet = null;
 		try {
-			preparedStament = connection.prepareStatement(
+			preparedStatement = connection.prepareStatement(
 					"SELECT seller.*, department.Name as DepName "
 					+ "FROM seller INNER JOIN department "
 					+ "ON seller.DepartmentId = department.Id "
 					+ "");
 			
-			resultSet = preparedStament.executeQuery();
+			resultSet = preparedStatement.executeQuery();
 			
 			List<Vendedor> listaVendedor = new ArrayList<Vendedor>();
 			Map<Integer, Departamento> map = new HashMap<>();
@@ -122,24 +150,22 @@ public class VendedorDaoJDBC implements VendedorDAO{
 			throw new DbException(e.getMessage());
 		}
 		finally {
-			DB.closeStatement(preparedStament);
+			DB.closeStatement(preparedStatement);
 			DB.closeResultSet(resultSet);
 		}
 	}
 
 	@Override
 	public List<Vendedor> findByDepartamento(Departamento departamento) {
-		PreparedStatement preparedStament = null;
-		ResultSet resultSet = null;
 		try {
-			preparedStament = connection.prepareStatement(
+			preparedStatement = connection.prepareStatement(
 					"SELECT seller.*, department.Name as DepName "
 					+ "FROM seller INNER JOIN department "
 					+ "ON seller.DepartmentId = department.Id "
 					+ "WHERE department.Id = ?");
 			
-			preparedStament.setInt(1, departamento.getId());
-			resultSet = preparedStament.executeQuery();
+			preparedStatement.setInt(1, departamento.getId());
+			resultSet = preparedStatement.executeQuery();
 			
 			List<Vendedor> listaVendedor = new ArrayList<Vendedor>();
 			Map<Integer, Departamento> map = new HashMap<>();
@@ -160,7 +186,7 @@ public class VendedorDaoJDBC implements VendedorDAO{
 			throw new DbException(e.getMessage());
 		}
 		finally {
-			DB.closeStatement(preparedStament);
+			DB.closeStatement(preparedStatement);
 			DB.closeResultSet(resultSet);
 		}
 	}	
